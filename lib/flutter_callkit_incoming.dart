@@ -31,7 +31,7 @@ class FlutterCallkitIncoming {
   /// CallEvent.ACTION_CALL_TOGGLE_AUDIO_SESSION - only iOS
   /// CallEvent.DID_UPDATE_DEVICE_PUSH_TOKEN_VOIP - only iOS
   /// }
-  static Stream<CallEvent?> get onEvent =>
+  static Stream<CallEvent> get onEvent =>
       _eventChannel.receiveBroadcastStream().map(_receiveCallEvent);
 
   /// Show Callkit Incoming.
@@ -79,7 +79,7 @@ class FlutterCallkitIncoming {
     return await _channel.invokeMethod("getDevicePushTokenVoIP");
   }
 
-  static CallEvent? _receiveCallEvent(dynamic data) {
+  static CallEvent _receiveCallEvent(dynamic data) {
     var event = "";
     dynamic body = {};
     if (data is Map) {
