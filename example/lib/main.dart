@@ -1,11 +1,11 @@
 import 'dart:ffi';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -14,11 +14,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   showCallkitIncoming('5c3ab1f0-8750-42eb-8d29-ad28e3d7f336');
 }
 
-Future<void> listenerEvent(Function? callback) async {
+Future<void> listenerEvent(Function callback) async {
   try {
     FlutterCallkitIncoming.onEvent.listen((event) {
       print(event);
-      switch (event!.name) {
+      switch (event.name) {
         case CallEvent.ACTION_CALL_INCOMING:
           // TODO: received an incoming call
           break;
@@ -122,7 +122,7 @@ class _MyAppState extends State<MyApp> {
   var _currentUuid;
   var textEvents = "";
 
-  late final FirebaseMessaging _firebaseMessaging;
+  FirebaseMessaging _firebaseMessaging;
 
   @override
   void initState() {

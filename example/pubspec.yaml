@@ -6,7 +6,7 @@ description: Demonstrates how to use the flutter_callkit_incoming plugin.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.0.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -22,11 +22,15 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  uuid: 3.0.5
-  firebase_messaging: 11.2.6
-  firebase_core: ^1.12.0
-  firebase_messaging_platform_interface: 3.1.6
+  cupertino_icons:
+  uuid:
+  firebase_messaging: #8.0.0-dev.5
+    git:
+      url: https://github.com/ayush221b/flutterfire.git
+      path: packages/firebase_messaging/firebase_messaging
+      ref: 1ffb3cca8822c96ebd5380777880c150404cb7d6
+  firebase_core:
+  #firebase_messaging_platform_interface:
 
 dev_dependencies:
   flutter_test:
