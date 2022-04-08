@@ -1,14 +1,22 @@
 package com.hiennv.flutter_callkit_incoming
 
+import android.animation.ArgbEvaluator
+import android.animation.TimeAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlarmManager
 import android.app.KeyguardManager
 import android.app.KeyguardManager.KeyguardLock
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -41,8 +49,13 @@ import com.squareup.picasso.OkHttp3Downloader
 import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
+import android.widget.RelativeLayout
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT
+import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE
+import java.util.concurrent.TimeUnit
 
-
+private const val SCHEDULE_TIME = 1L
 class CallkitIncomingActivity : Activity() {
 
     companion object {
@@ -76,13 +89,16 @@ class CallkitIncomingActivity : Activity() {
 
     private var endedCallkitIncomingBroadcastReceiver = EndedCallkitIncomingBroadcastReceiver()
 
-    private lateinit var ivBackground: ImageView
-    private lateinit var llBackgroundAnimation: RippleRelativeLayout
+    private lateinit var ivBackground: LinearLayout
+    private lateinit var llBackgroundAnimation: LinearLayout
 
     private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
-    private lateinit var ivLogo: ImageView
     private lateinit var ivAvatar: CircleImageView
+
+    private lateinit var tvCardSubText: TextView
+    private lateinit var tvAcceptCallText: TextView
+    private lateinit var tvDeclineCallText: TextView
 
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
@@ -90,26 +106,20 @@ class CallkitIncomingActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            setTurnScreenOn(true)
-            setShowWhenLocked(true)
-        } else {
-            window.addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-                        or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-            )
-        }
         transparentStatusAndNavigation()
+
         setContentView(R.layout.activity_callkit_incoming)
+        turnScreenOnAndKeyguardOff()
         initView()
         incomingData(intent)
         registerReceiver(
             endedCallkitIncomingBroadcastReceiver,
             IntentFilter(ACTION_ENDED_CALL_INCOMING)
         )
+    }
+
+    private fun getReceiver(lockScreen: Any): PendingIntent? {
+        TODO("Not yet implemented")
     }
 
     private fun wakeLockRequest(duration: Long) {
@@ -160,11 +170,10 @@ class CallkitIncomingActivity : Activity() {
         val data = intent.extras?.getBundle(EXTRA_CALLKIT_INCOMING_DATA)
         if (data == null) finish()
 
-        tvNameCaller.text = data?.getString(EXTRA_CALLKIT_NAME_CALLER, "")
-        tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
 
-        val isShowLogo = data?.getBoolean(EXTRA_CALLKIT_IS_SHOW_LOGO, false)
-        ivLogo.visibility = if (isShowLogo == true) View.VISIBLE else View.INVISIBLE
+        tvNumber.text = data?.getString(EXTRA_CALLKIT_HANDLE, "")
+        val instructorMessage = "Your instructor " + data?.getString(EXTRA_CALLKIT_NAME_CALLER, "") + " is asking you to join now"
+        tvCardSubText.text = instructorMessage
 
         val avatarUrl = data?.getString(EXTRA_CALLKIT_AVATAR, "")
         if (avatarUrl != null && avatarUrl.isNotEmpty()) {
@@ -177,6 +186,27 @@ class CallkitIncomingActivity : Activity() {
                 .into(ivAvatar)
         }
 
+        val acceptUrl = data?.getString(EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE, "")
+        val declineUrl = data?.getString(EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE, "")
+
+        if(acceptUrl != null && acceptUrl.isNotEmpty()){
+            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(this@CallkitIncomingActivity, headers)
+                .load(acceptUrl)
+                .placeholder(R.drawable.ic_accept)
+                .error(R.drawable.ic_accept)
+                .into(ivAcceptCall)
+        }
+
+        if(declineUrl != null && declineUrl.isNotEmpty()){
+            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+            getPicassoInstance(this@CallkitIncomingActivity, headers)
+                .load(acceptUrl)
+                .placeholder(R.drawable.ic_decline)
+                .error(R.drawable.ic_decline)
+                .into(ivDeclineCall)
+        }
+
         val callType = data?.getInt(EXTRA_CALLKIT_TYPE, 0) ?: 0
         if (callType > 0) {
             ivAcceptCall.setImageResource(R.drawable.ic_video)
@@ -186,20 +216,34 @@ class CallkitIncomingActivity : Activity() {
 
         finishTimeout(data, duration)
 
-        val backgroundColor = data?.getString(EXTRA_CALLKIT_BACKGROUND_COLOR, "#0955fa")
-        try {
-            ivBackground.setBackgroundColor(Color.parseColor(backgroundColor))
-        } catch (error: Exception) {
+        startAnimation()
+    }
+
+    private fun startAnimation(){
+        val start = Color.parseColor("#534C54")
+        val mid = Color.parseColor("#382E43")
+
+
+        val bg = llAction.background as GradientDrawable
+        llAction.background.setDither(true)
+        ivBackground.background.setDither(true)
+
+        val evaluator = ArgbEvaluator()
+        val animator = TimeAnimator.ofFloat(0.0f, 1.0f)
+        animator.duration = 3000
+        animator.repeatCount = ValueAnimator.INFINITE
+        animator.repeatMode = ValueAnimator.REVERSE
+        animator.addUpdateListener {
+            val fraction = it.animatedFraction
+            val newStart = evaluator.evaluate(fraction, start, mid) as Int
+            val newMid = evaluator.evaluate(fraction, mid, start) as Int
+            val newEnd = evaluator.evaluate(fraction, start, mid) as Int
+
+            bg.colors = intArrayOf(newStart, newMid, newEnd)
         }
-        val backgroundUrl = data?.getString(EXTRA_CALLKIT_BACKGROUND_URL, "")
-        if (backgroundUrl != null && backgroundUrl.isNotEmpty()) {
-            val headers = data.getSerializable(EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
-            getPicassoInstance(this@CallkitIncomingActivity, headers)
-                .load(backgroundUrl)
-                .placeholder(R.drawable.transparent)
-                .error(R.drawable.transparent)
-                .into(ivBackground)
-        }
+
+        animator.start()
+
     }
 
     private fun finishTimeout(data: Bundle?, duration: Long) {
@@ -221,16 +265,15 @@ class CallkitIncomingActivity : Activity() {
     }
 
     private fun initView() {
-        ivBackground = findViewById(R.id.ivBackground)
-        llBackgroundAnimation = findViewById(R.id.llBackgroundAnimation)
-        llBackgroundAnimation.layoutParams.height =
-            Utils.getScreenWidth() + Utils.getStatusBarHeight(this@CallkitIncomingActivity)
-        llBackgroundAnimation.startRippleAnimation()
 
         tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
-        ivLogo = findViewById(R.id.ivLogo)
-        ivAvatar = findViewById(R.id.ivAvatar)
+        ivAvatar = findViewById(R.id.ivCircularImage)
+        tvAcceptCallText = findViewById(R.id.tvAccept)
+        tvDeclineCallText = findViewById(R.id.tvDecline)
+        tvCardSubText = findViewById(R.id.tvCardData)
+        ivBackground = findViewById(R.id.ivBackground)
+
 
         llAction = findViewById(R.id.llAction)
 
@@ -240,7 +283,7 @@ class CallkitIncomingActivity : Activity() {
 
         ivAcceptCall = findViewById(R.id.ivAcceptCall)
         ivDeclineCall = findViewById(R.id.ivDeclineCall)
-        animateAcceptCall()
+        //animateAcceptCall()
 
         ivAcceptCall.setOnClickListener {
             onAcceptClick()
@@ -248,6 +291,11 @@ class CallkitIncomingActivity : Activity() {
         ivDeclineCall.setOnClickListener {
             onDeclineClick()
         }
+
+        tvNameCaller.setTypeface(null, Typeface.BOLD)
+        tvDeclineCallText.setTypeface(null, Typeface.BOLD)
+        tvAcceptCallText.setTypeface(null, Typeface.BOLD)
+        tvCardSubText.setTypeface(null, Typeface.BOLD)
     }
 
     private fun animateAcceptCall() {
@@ -302,10 +350,41 @@ class CallkitIncomingActivity : Activity() {
 
     override fun onDestroy() {
         unregisterReceiver(endedCallkitIncomingBroadcastReceiver)
+        turnScreenOffAndKeyguardOn()
         super.onDestroy()
     }
 
     override fun onBackPressed() {}
+
+    private fun Activity.turnScreenOnAndKeyguardOff() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+        }
+
+        with(getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                requestDismissKeyguard(this@turnScreenOnAndKeyguardOff, null)
+            }
+        }
+    }
+
+    fun Activity.turnScreenOffAndKeyguardOn() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(false)
+            setTurnScreenOn(false)
+        } else {
+            window.clearFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                        or WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            )
+        }
+    }
 
 
 }

@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
+import androidx.core.content.ContextCompat.startActivity
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -138,7 +139,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "showMissCallNotification" -> {
                     val data = Data(call.arguments())
                     data.from = "notification"
-                    callkitNotificationManager?.showMissCallNotification(data.toBundle())
                     result.success("OK")
                 }
                 "startCall" -> {
@@ -238,6 +238,4 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             eventSink = null
         }
     }
-
-
 }

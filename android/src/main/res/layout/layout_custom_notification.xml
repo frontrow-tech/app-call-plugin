@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/notification_bg"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -11,29 +16,72 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/ivAvatar"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvNameCaller"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-                android:textSize="@dimen/size_text_action" />
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/tvNameCaller"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WORKSHOP STARTED!"
+                    app:fontWeight="800"
+                    android:textColor="@android:color/white"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                    android:textSize="@dimen/size_text_action" />
+                <TextView
+                    android:id="@id/tvNameCaller"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ukelele fingerpicking basics"
+                    android:textColor="@android:color/white"
+                    android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tvNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
-                android:textSize="@dimen/size_text_action" />
+            </LinearLayout>
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:backgroundTint="#EE596B"
+            android:padding="4dp"
+            android:height="20dp"
+            android:background="@drawable/live_bg"
+            android:layout_alignParentEnd="true"
+            android:layout_height="wrap_content">
+
+<!--            <androidx.appcompat.widget.AppCompatImageView-->
+<!--                android:layout_width="16dp"-->
+<!--                android:src="@drawable/ic_live_icon"-->
+<!--                app:tint="@android:color/white"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_height="16dp"/>-->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="LIVE NOW"
+            android:textSize="10sp"
+            android:gravity="right"
+            app:fontWeight="700"
+            android:textColor="@android:color/white"
+            android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:paddingTop="16dp"
+        android:paddingBottom="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/ivAvatar"
@@ -41,8 +89,21 @@
             android:layout_height="@dimen/base_margin_x4"
             android:layout_alignParentRight="true"
             android:scaleType="centerCrop"
-            android:visibility="invisible" />
-    </RelativeLayout>
+            android:src="@drawable/ic_default_avatar"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvCardData"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="12dp"
+            android:gravity="left|center"
+            android:text="Your instructor is asking you to join now"
+            android:textColor="@android:color/white"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -54,13 +115,14 @@
         <LinearLayout
             android:id="@+id/llDecline"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/base_margin_half"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_button_decline"
+            android:layout_height="38dp"
+            android:background="@drawable/button_border"
             android:clickable="true"
             android:focusable="true"
+            android:padding="12dp"
+            android:layout_weight="1"
             android:gravity="center"
+            android:layout_marginRight="24dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -83,14 +145,17 @@
 
         </LinearLayout>
 
+
         <LinearLayout
             android:id="@+id/llAccept"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/base_margin_half"
-            android:layout_weight="1"
-            android:background="@drawable/rounded_button_accept"
+            android:layout_height="38dp"
+            android:padding="12dp"
             android:clickable="true"
+            android:layout_weight="1"
+            android:layout_marginLeft="24dp"
+            android:background="@drawable/button_border"
+            android:backgroundTint="@android:color/white"
             android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal">
@@ -98,20 +163,19 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/base_margin"
                 android:src="@drawable/ic_accept"
-                android:tint="@android:color/white"
-                app:tint="@android:color/white"
+                android:tint="@android:color/black"
+                app:tint="@android:color/black"
                 tools:ignore="UseAppTint" />
 
             <TextView
-                style="@style/Widget.Compat.NotificationActionText"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_margin_x4"
+                android:layout_height="38dp"
                 android:gravity="center"
                 android:text="@string/text_accept"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white" />
+                android:textAllCaps="true"
+                app:fontWeight="800"
+                android:textColor="@android:color/black" />
 
         </LinearLayout>
 

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import java.util.*
 
 class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
 
@@ -44,6 +45,10 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
         const val EXTRA_CALLKIT_BACKGROUND_COLOR = "EXTRA_CALLKIT_BACKGROUND_COLOR"
         const val EXTRA_CALLKIT_BACKGROUND_URL = "EXTRA_CALLKIT_BACKGROUND_URL"
         const val EXTRA_CALLKIT_ACTION_COLOR = "EXTRA_CALLKIT_ACTION_COLOR"
+        const val EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE = "EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE"
+        const val EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT = "EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT"
+        const val EXTRA_CALLKIT_DECLINE_BUTTON_TEXT = "EXTRA_CALLKIT_DECLINE_BUTTON_TEXT"
+        const val EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE = "EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE"
 
         const val EXTRA_CALLKIT_ACTION_FROM = "EXTRA_CALLKIT_ACTION_FROM"
 
@@ -106,6 +111,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     val soundPlayerServiceIntent = Intent(context, CallkitSoundPlayerService::class.java)
                     soundPlayerServiceIntent.putExtras(data)
                     context.startService(soundPlayerServiceIntent)
+                    //context.showNotificationWithFullScreenIntent()
                 } catch (error: Exception) {
                     error.printStackTrace()
                 }
@@ -152,7 +158,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                 try {
                     sendEventFlutter(ACTION_CALL_TIMEOUT, data)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
-                    callkitNotificationManager.showMissCallNotification(data)
                     removeCall(context, Data.fromBundle(data))
                 } catch (error: Exception) {
                     error.printStackTrace()
@@ -160,7 +165,6 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
             ACTION_CALL_CALLBACK -> {
                 try {
-                    callkitNotificationManager.clearMissCallNotification(data)
                     sendEventFlutter(ACTION_CALL_CALLBACK, data)
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                         val closeNotificationPanel = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
@@ -190,8 +194,12 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             "type" to data.getInt(EXTRA_CALLKIT_TYPE, 0),
             "duration" to data.getLong(EXTRA_CALLKIT_DURATION, 0L),
             "extra" to data.getSerializable(EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>,
+            "declineButtonText" to data.getString(EXTRA_CALLKIT_DECLINE_BUTTON_TEXT),
+            "declineButtonImg" to data.getString(EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE),
+            "acceptButtonImg" to data.getString(EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE),
+            "acceptButtonText" to data.getString(EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT),
             "android" to android
-        )
+        ) as Map<String, Any>
         FlutterCallkitIncomingPlugin.sendEvent(event, forwardData)
     }
 }

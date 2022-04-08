@@ -15,6 +15,10 @@ data class Data(val args: Map<String, Any?>) {
     var avatar: String = (args["avatar"] as? String) ?: ""
     var type: Int = (args["type"] as? Int) ?: 0
     var duration: Long = (args["duration"] as? Long) ?: 30000L
+    var declineButtonText: String = (args["declineButtonText"] as? String) ?: "CANCEL"
+    var acceptButtonText: String = (args["acceptButtonText"] as? String) ?: "JOIN"
+    var declineButtonImg: String = (args["declineButtonImg"] as? String) ?: ""
+    var acceptButtonImg: String = (args["acceptButtonImg"] as? String) ?: ""
     var extra: HashMap<String, Any?> =
         (args["extra"] ?: HashMap<String, Any?>()) as HashMap<String, Any?>
     var headers: HashMap<String, Any?> =
@@ -69,6 +73,10 @@ data class Data(val args: Map<String, Any?>) {
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_NAME_CALLER, nameCaller)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, handle)
         bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, avatar)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DECLINE_BUTTON_TEXT, declineButtonText)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT, acceptButtonText)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE, acceptButtonImg)
+        bundle.putString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE, declineButtonImg)
         bundle.putInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, type)
         bundle.putLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, duration)
         bundle.putSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA, extra)
@@ -112,6 +120,14 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HANDLE, "")
             data.avatar =
                 bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_AVATAR, "")
+            data.acceptButtonImg =
+                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE, "")
+            data.acceptButtonText =
+                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT, "")
+            data.declineButtonImg =
+                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE, "")
+            data.declineButtonText =
+                bundle.getString(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DECLINE_BUTTON_TEXT, "")
             data.type = bundle.getInt(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_TYPE, 0)
             data.duration =
                 bundle.getLong(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_DURATION, 30000L)
@@ -119,6 +135,7 @@ data class Data(val args: Map<String, Any?>) {
                 bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_EXTRA) as HashMap<String, Any?>
             data.headers =
                 bundle.getSerializable(CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_HEADERS) as HashMap<String, Any?>
+
 
             data.isCustomNotification = bundle.getBoolean(
                 CallkitIncomingBroadcastReceiver.EXTRA_CALLKIT_IS_CUSTOM_NOTIFICATION,
