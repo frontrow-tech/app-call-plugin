@@ -57,7 +57,17 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="16dp"
+                    android:id="@+id/ivLiveAnim"
                     android:layout_height="16dp"
+                    android:duration="1000"
+                    android:fromXScale="1"
+                    android:fromYScale="1"
+                    android:pivotX="50%"
+                    android:pivotY="50%"
+                    android:repeatCount="1"
+                    android:repeatMode="reverse"
+                    android:toXScale="0.5"
+                    android:toYScale="0.5"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_live_icon"
                     app:tint="@android:color/white" />

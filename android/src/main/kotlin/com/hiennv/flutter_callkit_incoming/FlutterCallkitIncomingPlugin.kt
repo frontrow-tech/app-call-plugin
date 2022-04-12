@@ -3,11 +3,15 @@ package com.hiennv.flutter_callkit_incoming
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.core.content.ContextCompat.startActivity
+import io.flutter.embedding.engine.FlutterEngineCache
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -17,15 +21,15 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import org.json.JSONObject
 
 /** FlutterCallkitIncomingPlugin */
 class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
-
     companion object {
-
+        var coreChannel: MethodChannel? = null
         @SuppressLint("StaticFieldLeak")
         private var instance: FlutterCallkitIncomingPlugin? = null
-
+        lateinit var eventHandler: EventCallbackHandler
         public fun getInstance(): FlutterCallkitIncomingPlugin  {
             if(instance == null){
                 instance = FlutterCallkitIncomingPlugin()
@@ -33,23 +37,13 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             return instance!!
         }
 
-        private val eventHandler = EventCallbackHandler()
 
         fun sendEvent(event: String, body: Map<String, Any>) {
             eventHandler.send(event, body)
         }
 
-        private fun sharePluginWithRegister(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding, @Nullable handler: MethodCallHandler) {
-            if(instance == null) {
-                instance = FlutterCallkitIncomingPlugin()
-            }
-            instance!!.context = flutterPluginBinding.applicationContext
-            instance!!.callkitNotificationManager = CallkitNotificationManager(flutterPluginBinding.applicationContext)
-            instance!!.channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming")
-            instance!!.channel?.setMethodCallHandler(handler)
-            instance!!.events =
-                EventChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming_events")
-            instance!!.events?.setStreamHandler(eventHandler)
+        fun initChannel(channel: MethodChannel) {
+            coreChannel = channel
         }
 
     }
@@ -66,7 +60,8 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
 
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        this.context = flutterPluginBinding.applicationContext
+        context = flutterPluginBinding.applicationContext
+        eventHandler = EventCallbackHandler(con = context!!)
         callkitNotificationManager = CallkitNotificationManager(flutterPluginBinding.applicationContext)
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming")
         channel?.setMethodCallHandler(this)
@@ -74,49 +69,6 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             EventChannel(flutterPluginBinding.binaryMessenger, "flutter_callkit_incoming_events")
         events?.setStreamHandler(eventHandler)
  //       sharePluginWithRegister(flutterPluginBinding, this)
-    }
-
-    public fun showIncomingNotification(data: Data) {
-        data.from = "notification"
-        callkitNotificationManager?.showIncomingNotification(data.toBundle())
-        //send BroadcastReceiver
-        context?.sendBroadcast(
-            CallkitIncomingBroadcastReceiver.getIntentIncoming(
-                requireNotNull(context),
-                data.toBundle()
-            )
-        )
-    }
-
-    public fun startCall(data: Data) {
-        context?.sendBroadcast(
-            CallkitIncomingBroadcastReceiver.getIntentStart(
-                requireNotNull(context),
-                data.toBundle()
-            )
-        )
-    }
-
-    public fun endCall(data: Data) {
-        context?.sendBroadcast(
-            CallkitIncomingBroadcastReceiver.getIntentEnded(
-                requireNotNull(context),
-                data.toBundle()
-            )
-        )
-    }
-
-    public fun endAllCalls() {
-        val calls = getDataActiveCalls(context)
-        calls.forEach {
-            context?.sendBroadcast(
-                CallkitIncomingBroadcastReceiver.getIntentEnded(
-                    requireNotNull(context),
-                    it.toBundle()
-                )
-            )
-        }
-        removeAllCalls(context)
     }
 
 
@@ -216,9 +168,11 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
     override fun onDetachedFromActivity() {}
 
 
-    class EventCallbackHandler : EventChannel.StreamHandler {
+    class EventCallbackHandler(con: Context) : EventChannel.StreamHandler {
 
         private var eventSink: EventChannel.EventSink? = null
+
+        private var context: Context = con
 
         override fun onListen(arguments: Any?, sink: EventChannel.EventSink) {
             eventSink = sink
@@ -229,9 +183,23 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
                 "event" to event,
                 "body" to body
             )
-            Handler(Looper.getMainLooper()).post {
-                eventSink?.success(data)
+            val pm: PackageManager? = context.packageManager
+            val launchIntent: Intent? = pm?.getLaunchIntentForPackage("io.connectcourses.app")
+            context.startActivity(launchIntent)
+            val jsonData = JSONObject()
+            if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"){
+                jsonData.put("runtimeType", "rebooking_screen")
+                val extraData = body["extra"] as Map<*, *>
+                jsonData.put("courseId", extraData["courseId"])
+            } else if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"){
+                jsonData.put("runtimeType", "live_session")
+                jsonData.put("meetingId", "62504dcca26d2f8ec0702a7a")
             }
+            if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT" || event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE")
+                Handler(Looper.getMainLooper()).postDelayed( {
+                coreChannel?.invokeMethod("IN_APP_CALL_SCREEN", jsonData.toString())
+                //eventSink?.success(data)
+            }, 2000)
         }
 
         override fun onCancel(arguments: Any?) {

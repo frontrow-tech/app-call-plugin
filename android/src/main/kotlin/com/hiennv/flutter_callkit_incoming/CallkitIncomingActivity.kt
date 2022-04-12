@@ -50,10 +50,15 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.widget.RelativeLayout
+import androidx.appcompat.widget.AppCompatImageView
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACCEPT_BUTTON_IMAGE
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_ACCEPT_BUTTON_TEXT
 import com.hiennv.flutter_callkit_incoming.CallkitIncomingBroadcastReceiver.Companion.EXTRA_CALLKIT_DECLINE_BUTTON_IMAGE
 import java.util.concurrent.TimeUnit
+import android.view.animation.Animation
+
+
+
 
 private const val SCHEDULE_TIME = 1L
 class CallkitIncomingActivity : Activity() {
@@ -103,6 +108,8 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var llAction: LinearLayout
     private lateinit var ivAcceptCall: ImageView
     private lateinit var ivDeclineCall: ImageView
+
+    private lateinit var ivLiveAnim: AppCompatImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -273,6 +280,9 @@ class CallkitIncomingActivity : Activity() {
         tvDeclineCallText = findViewById(R.id.tvDecline)
         tvCardSubText = findViewById(R.id.tvCardData)
         ivBackground = findViewById(R.id.ivBackground)
+        ivLiveAnim = findViewById(R.id.ivLiveAnim)
+        val pulse = AnimationUtils.loadAnimation(this, R.anim.breathe_anim)
+        ivLiveAnim.startAnimation(pulse)
 
 
         llAction = findViewById(R.id.llAction)
@@ -291,6 +301,8 @@ class CallkitIncomingActivity : Activity() {
         ivDeclineCall.setOnClickListener {
             onDeclineClick()
         }
+
+
 
         tvNameCaller.setTypeface(null, Typeface.BOLD)
         tvDeclineCallText.setTypeface(null, Typeface.BOLD)
@@ -314,11 +326,11 @@ class CallkitIncomingActivity : Activity() {
             val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
             keyguardManager.requestDismissKeyguard(this, null)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAndRemoveTask()
-        } else {
-            finish()
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            finishAndRemoveTask()
+//        } else {
+//            finish()
+//        }
     }
 
     private fun onDeclineClick() {
