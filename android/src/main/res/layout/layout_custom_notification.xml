@@ -29,7 +29,6 @@
                     android:id="@+id/tvNameCaller"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WORKSHOP STARTED!"
                     app:fontWeight="800"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
@@ -38,7 +37,6 @@
                     android:id="@id/tvNameCaller"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ukelele fingerpicking basics"
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                     android:textSize="14sp" />
@@ -78,7 +76,7 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:paddingTop="16dp"
+        android:paddingTop="12dp"
         android:paddingBottom="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -98,7 +96,6 @@
             android:layout_height="match_parent"
             android:layout_marginStart="12dp"
             android:gravity="left|center"
-            android:text="Your instructor is asking you to join now"
             android:textColor="@android:color/white"
             android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
             android:textSize="14sp" />
@@ -115,7 +112,7 @@
         <LinearLayout
             android:id="@+id/llDecline"
             android:layout_width="0dp"
-            android:layout_height="38dp"
+            android:layout_height="36dp"
             android:background="@drawable/button_border"
             android:clickable="true"
             android:focusable="true"
@@ -149,7 +146,7 @@
         <LinearLayout
             android:id="@+id/llAccept"
             android:layout_width="0dp"
-            android:layout_height="38dp"
+            android:layout_height="36dp"
             android:padding="12dp"
             android:clickable="true"
             android:layout_weight="1"
@@ -170,7 +167,7 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
+                android:layout_height="36dp"
                 android:gravity="center"
                 android:text="@string/text_accept"
                 android:textAllCaps="true"
