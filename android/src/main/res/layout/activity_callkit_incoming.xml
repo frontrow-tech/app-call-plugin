@@ -24,7 +24,7 @@
 
 
         <TextView
-            android:id="@+id/tvNameCaller"
+            android:id="@+id/workshopStarted"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
@@ -33,7 +33,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:text="Workshop has started!"
+            android:text="@string/workshop_started"
             android:textColor="@android:color/white"
             android:textFontWeight="800"
             android:textSize="@dimen/size_text_name"
@@ -135,7 +135,7 @@
                     android:ellipsize="end"
                     android:gravity="center"
                     android:scrollHorizontally="false"
-                    android:text="Your instructor Michele Bavassano is asking you to join now"
+                    android:text=""
                     android:textColor="@color/action_text"
                     android:textSize="16sp"
                     tools:text="Your instructor Michele Bavassano is asking you to join now" />

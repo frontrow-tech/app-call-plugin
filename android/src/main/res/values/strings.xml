@@ -5,4 +5,5 @@
     <string name="text_decline" tools:ignore="ButtonCase">CANCEL</string>
     <string name="text_missed_call">Missed call</string>
     <string name="text_call_back">Call back</string>
+    <string name="workshop_started">Workshop Started!</string>
 </resources>
