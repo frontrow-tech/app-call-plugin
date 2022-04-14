@@ -30,6 +30,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:fontWeight="800"
+                    android:text=""
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                     android:textSize="@dimen/size_text_action" />
@@ -37,6 +38,7 @@
                     android:id="@id/tvNameCaller"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text=""
                     android:textColor="@android:color/white"
                     android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
                     android:textSize="14sp" />
@@ -76,106 +78,93 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:paddingTop="12dp"
         android:paddingBottom="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/ivAvatar"
             android:layout_width="@dimen/base_margin_x4"
             android:layout_height="@dimen/base_margin_x4"
-            android:layout_alignParentRight="true"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_default_avatar"
             android:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tvCardData"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="12dp"
-            android:gravity="left|center"
-            android:textColor="@android:color/white"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/base_margin"
-        android:orientation="horizontal">
-
-
-        <LinearLayout
-            android:id="@+id/llDecline"
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:background="@drawable/button_border"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="12dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_marginRight="24dp"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/base_margin"
-                android:src="@drawable/ic_decline"
-                android:tint="@android:color/white"
-                app:tint="@android:color/white"
-                tools:ignore="UseAppTint" />
 
-            <TextView
-                style="@style/Widget.Compat.NotificationActionText"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/base_margin_x4"
-                android:gravity="center"
-                android:text="@string/text_decline"
-                android:textAllCaps="false"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/llAccept"
-            android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:padding="12dp"
-            android:clickable="true"
-            android:layout_weight="1"
-            android:layout_marginLeft="24dp"
-            android:background="@drawable/button_border"
-            android:backgroundTint="@android:color/white"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_accept"
-                android:tint="@android:color/black"
-                app:tint="@android:color/black"
-                tools:ignore="UseAppTint" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/llDecline"
+                android:layout_width="0dp"
                 android:layout_height="36dp"
+                android:background="@drawable/button_border"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:text="@string/text_accept"
-                android:textAllCaps="true"
-                app:fontWeight="800"
-                android:textColor="@android:color/black" />
+                android:layout_marginStart="24dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/base_margin"
+                    android:src="@drawable/ic_decline"
+                    android:tint="@android:color/white"
+                    app:tint="@android:color/white"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    style="@style/Widget.Compat.NotificationActionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/base_margin_x4"
+                    android:gravity="center"
+                    android:text="@string/text_decline"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/llAccept"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:padding="12dp"
+                android:clickable="true"
+                android:layout_weight="1"
+                android:layout_marginLeft="24dp"
+                android:background="@drawable/button_border"
+                android:backgroundTint="@android:color/white"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_accept"
+                    android:tint="@android:color/black"
+                    app:tint="@android:color/black"
+                    tools:ignore="UseAppTint" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:gravity="center"
+                    android:text="@string/text_accept"
+                    android:textAllCaps="true"
+                    app:fontWeight="800"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
-
 
     </LinearLayout>
 
