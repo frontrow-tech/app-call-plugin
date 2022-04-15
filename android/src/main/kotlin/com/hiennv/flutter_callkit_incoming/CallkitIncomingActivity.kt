@@ -97,7 +97,6 @@ class CallkitIncomingActivity : Activity() {
     private lateinit var ivBackground: LinearLayout
     private lateinit var llBackgroundAnimation: LinearLayout
 
-    private lateinit var tvNameCaller: TextView
     private lateinit var tvNumber: TextView
     private lateinit var ivAvatar: CircleImageView
 
@@ -273,7 +272,6 @@ class CallkitIncomingActivity : Activity() {
 
     private fun initView() {
 
-        tvNameCaller = findViewById(R.id.tvNameCaller)
         tvNumber = findViewById(R.id.tvNumber)
         ivAvatar = findViewById(R.id.ivCircularImage)
         tvAcceptCallText = findViewById(R.id.tvAccept)
@@ -302,9 +300,6 @@ class CallkitIncomingActivity : Activity() {
             onDeclineClick()
         }
 
-
-
-        tvNameCaller.setTypeface(null, Typeface.BOLD)
         tvDeclineCallText.setTypeface(null, Typeface.BOLD)
         tvAcceptCallText.setTypeface(null, Typeface.BOLD)
         tvCardSubText.setTypeface(null, Typeface.BOLD)
