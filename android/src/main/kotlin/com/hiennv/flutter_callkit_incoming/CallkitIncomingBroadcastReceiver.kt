@@ -132,10 +132,8 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
                     val launchIntent: Intent? = pm.getLaunchIntentForPackage("io.connectcourses.app")
                     val jsonData = JSONObject()
                     sendEventFlutter(ACTION_CALL_ACCEPT, data)
-                    jsonData.put("runtimeType", data["meetingId"])
+                    jsonData.put("runtimeType", data["roomId"])
                     jsonData.put("courseId", data["courseId"])
-                    Log.d(">>>>>>>>>>>", jsonData.toString())
-                    Log.d("....", data.toString())
                     launchIntent?.putExtra("inAppReminder", jsonData.toString())
                     context.startActivity(launchIntent)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
@@ -147,16 +145,7 @@ class CallkitIncomingBroadcastReceiver : BroadcastReceiver() {
             }
             ACTION_CALL_DECLINE -> {
                 try {
-//                    val pm: PackageManager = context.packageManager
-//                    val launchIntent: Intent? = pm.getLaunchIntentForPackage("io.connectcourses.app")
-//                    val jsonData = JSONObject()
-                    //TODO check for app terminated state and handle it
-//                    jsonData.put("runtimeType","live_session")
-//                    jsonData.put("courseId", "62504dcca26d2f8ec0702a7a")
-//                    Log.d(">>>>>>>>>>>", jsonData.toString())
                     sendEventFlutter(ACTION_CALL_DECLINE, data)
-//                    launchIntent?.putExtra("inAppReminder", jsonData.toString())
-//                    context.startActivity(launchIntent)
                     context.stopService(Intent(context, CallkitSoundPlayerService::class.java))
                     callkitNotificationManager.clearIncomingNotification(data)
                     removeCall(context, Data.fromBundle(data))
