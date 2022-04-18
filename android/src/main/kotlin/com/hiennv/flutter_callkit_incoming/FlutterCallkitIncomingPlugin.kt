@@ -186,14 +186,14 @@ class FlutterCallkitIncomingPlugin : FlutterPlugin, MethodCallHandler, ActivityA
             val pm: PackageManager? = context.packageManager
             val launchIntent: Intent? = pm?.getLaunchIntentForPackage("io.connectcourses.app")
             context.startActivity(launchIntent)
+            val extraData = body["extra"] as Map<*, *>
             val jsonData = JSONObject()
             if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE"){
                 jsonData.put("runtimeType", "rebooking_screen")
-                val extraData = body["extra"] as Map<*, *>
                 jsonData.put("courseId", extraData["courseId"])
             } else if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT"){
                 jsonData.put("runtimeType", "live_session")
-                jsonData.put("meetingId", "62504dcca26d2f8ec0702a7a")
+                jsonData.put("meetingId", extraData["roomId"])
             }
             if(event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_ACCEPT" || event == "com.hiennv.flutter_callkit_incoming.ACTION_CALL_DECLINE")
                 Handler(Looper.getMainLooper()).postDelayed( {
